@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Input Data - Stock Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700;800;900&display=swap');
+        
+        :root {
+            --bg-body: #1a1010; 
+            --bg-card: rgba(45, 25, 25, 0.7); 
+            --text-main: #ffffff;
+            --text-sub: #fca5a5; 
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(239, 68, 68, 0.2); 
+            --label-bg: #1a1010;
+            --accent-color: #ef4444; 
+            --accent-hover: #dc2626;
+            --title-shadow: rgba(239, 68, 68, 0.3);
+        }
+
+        .light-mode {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --input-bg: #f1f5f9;
+            --border-color: #e2e8f0;
+            --label-bg: #ffffff;
+            --accent-color: #6366f1; 
+            --accent-hover: #4f46e5;
+            --title-shadow: rgba(99, 102, 241, 0.2);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            transition: background 3.5s cubic-bezier(0.4, 0, 0.2, 1), color 3.5s cubic-bezier(0.4, 0, 0.2, 1);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .status-dot { height: 8px; width: 8px; background: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #22c55e; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        .notion-cover { height: 180px; width: 100%; background: #000 url('./hollow_purple.gif') center/cover no-repeat; border-bottom: 2px solid #312e81; position: relative; box-shadow: 0 10px 40px rgba(49, 46, 129, 0.4); }
+        .notion-cover::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, var(--bg-body) 100%); }
+
+        .avatar-ring {
+            width: 125px; height: 125px; margin-top: -65px; margin-left: 8%;
+            border-radius: 50%; padding: 4px;
+            background: linear-gradient(45deg, #4f46e5, #ec4899, #06b6d4, #4f46e5);
+            background-size: 400% 400%; animation: ringGradient 5s ease infinite;
+            box-shadow: 0 0 30px rgba(79, 70, 229, 0.6); position: relative; z-index: 100;
+        }
+        
+        .avatar-container { width: 100%; height: 100%; position: relative; border-radius: 50%; overflow: hidden; border: 5px solid var(--bg-body); transition: border 3.5s ease; }
+        .notion-page-avatar { width: 100%; height: 100%; border-radius: 50%; position: absolute; top: 0; left: 0; background-size: cover; background-position: center; transition: opacity 3.5s ease; }
+        
+        .avatar-gojo { background-image: url('./gojo.jpg'); opacity: 1; z-index: 2; }
+        .avatar-sukuna { background-image: url('./sukuna.jpg'); opacity: 0; z-index: 1; }
+
+        body:not(.light-mode) .avatar-gojo { opacity: 0; }
+        body:not(.light-mode) .avatar-sukuna { opacity: 1; }
+        body:not(.light-mode) .notion-cover { background-image: url('./sukuna_cover.gif'); border-bottom: 2px solid #ef4444; box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3); }
+
+        @keyframes ringGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .main-content { max-width: 850px; margin: 0 auto; padding: 10px 20px 100px; position: relative; z-index: 10; }
+        .page-title { font-family: 'Poppins', sans-serif; font-size: 42px; font-weight: 900; color: var(--text-main); letter-spacing: -2px; text-shadow: 0 0 20px var(--title-shadow); transition: color 3.5s ease; }
+
+        .aesthetic-card { 
+            background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color); border-radius: 28px; padding: 28px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); transition: all 3.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .notion-input { 
+            background: var(--input-bg); border: 1px solid var(--border-color); 
+            padding: 12px 16px; border-radius: 14px; font-size: 14px; outline: none; width: 100%; color: var(--text-main); 
+            transition: all 0.3s ease; 
+        }
+        .notion-input:focus { border: 1px solid var(--accent-color); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+
+        .theme-toggle {
+            position: fixed; bottom: 30px; right: 30px; z-index: 1000;
+            background: var(--accent-color); color: white; width: 56px; height: 56px;
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); cursor: pointer;
+            transition: background 3.5s ease;
+        }
+
+        .btn-main { background: var(--accent-color); transition: background 3.5s ease, transform 0.2s ease; }
+        .btn-main:hover { background: var(--accent-hover); }
+    </style>
+</head>
+<body class="dark-mode" id="bodyTag" onclick="startApp()">
+
+    <div class="theme-toggle" onclick="toggleTheme(); event.stopPropagation();">
+        <span id="themeIcon" class="text-xl">🌙</span>
+    </div>
+
+    <audio id="bgMusic" loop preload="auto"><source src="./music.mp3" type="audio/mpeg"></audio>
+    <audio id="sfxClick" preload="auto"><source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" type="audio/mpeg"></audio>
+    <audio id="voiceGelap" preload="auto"><source src="./gelap.mp3" type="audio/mpeg"></audio>
+    <audio id="voiceTerang" preload="auto"><source src="./terang.mp3" type="audio/mpeg"></audio>
+
+    <div class="notion-cover"></div>
+    <div class="avatar-ring">
+        <div class="avatar-container">
+            <div class="notion-page-avatar avatar-gojo"></div>
+            <div class="notion-page-avatar avatar-sukuna"></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2.5">
+                <div class="status-dot"></div>
+                <span class="text-[10px] font-bold bg-[var(--accent-color)] text-white px-3 py-1 rounded-md tracking-widest uppercase transition-colors duration-[3500ms]">EXP TRACKER</span>
+                <span class="text-xs text-[var(--text-sub)] font-semibold transition-colors duration-[3500ms]">//Powered By Dicki</span>
+            </div>
+            <a href="modis.html" class="group relative flex items-center gap-1.5 border-b border-dashed border-indigo-500/30 pb-0.5 hover:border-indigo-500 transition-all duration-300 active:scale-95">
+    <span class="h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-[0_0_5px_#6366f1] group-hover:animate-ping"></span>
+    
+    <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest group-hover:text-indigo-300 transition-colors">
+        Go To Modis
+    </span>
+    
+    <span class="text-[10px] text-indigo-500 transform group-hover:translate-x-0.5 transition-transform">
+        →
+    </span>
+</a>
+
+        </div>
+        
+        <h1 class="page-title mb-10">Stock Center</h1>
+
+        <div class="aesthetic-card mb-8">
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <input type="text" id="prodName" placeholder="Nama Produk..." class="notion-input">
+                    <input type="text" id="prodQty" placeholder="Σ Jumlah (Contoh: 10 Pcs)" class="notion-input">
+                </div>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="relative">
+                        <label class="text-[10px] text-[var(--text-sub)] absolute -top-2.5 left-3 bg-[var(--label-bg)] px-2 z-10 font-black uppercase tracking-widest transition-colors duration-[3500ms]">📅 Expired</label>
+                        <input type="date" id="prodExp" class="notion-input pt-4">
+                    </div>
+                    <div class="relative">
+                        <label class="text-[10px] text-[var(--text-sub)] absolute -top-2.5 left-3 bg-[var(--label-bg)] px-2 z-10 font-black uppercase tracking-widest transition-colors duration-[3500ms]">📍 No. Modis</label>
+                        <input type="number" id="prodModis" placeholder="Contoh: 5" class="notion-input pt-4">
+                    </div>
+                </div>
+                <button onclick="addItem()" class="w-full btn-main text-white py-4 rounded-2xl text-xs font-black uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all">Simpan Data</button>
+            </div>
+        </div>
+
+        <div class="pt-16 flex flex-col items-center gap-8">
+            <p class="text-center text-[9px] text-slate-400 font-mono tracking-[0.4em] uppercase">EXP TRACKER//Retail Security</p>
+        </div>
+    </div>
+
+    <script>
+        let items = JSON.parse(localStorage.getItem('notion_gojo_pro_db')) || [];
+        let appStarted = false;
+
+        function playSfx() { document.getElementById('sfxClick').play(); }
+
+        function toggleTheme() {
+            playSfx();
+            const body = document.getElementById('bodyTag');
+            const icon = document.getElementById('themeIcon');
+            body.classList.toggle('light-mode');
+            
+            const isLight = body.classList.contains('light-mode');
+            icon.innerText = isLight ? "☀️" : "🌙";
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+
+            const sfx = document.getElementById(isLight ? 'voiceTerang' : 'voiceGelap');
+            sfx.volume = 1.0; sfx.play().catch(() => {});
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        const body = document.getElementById('bodyTag');
+        const icon = document.getElementById('themeIcon');
+
+        if (savedTheme === 'light') {
+            body.classList.add('light-mode');
+            icon.innerText = "☀️";
+        } else {
+            body.classList.remove('light-mode');
+            icon.innerText = "🌙";
+        }
+
+        function startApp() {
+            if (!appStarted) {
+                const music = document.getElementById('bgMusic');
+                music.volume = 0.1; music.play().catch(() => {});
+                appStarted = true;
+            }
+        }
+
+        function addItem() {
+            playSfx();
+            const n = document.getElementById('prodName').value, e = document.getElementById('prodExp').value;
+            const m = document.getElementById('prodModis').value;
+            if(!n || !e || !m) return alert("Isi Nama, Expired, dan Nomor Modis!");
+            items.push({ id: Date.now(), name: n, qty: document.getElementById('prodQty').value, exp: e, modis: m });
+            localStorage.setItem('notion_gojo_pro_db', JSON.stringify(items));
+            alert("Data berhasil disimpan!");
+            document.getElementById('prodName').value = ""; document.getElementById('prodQty').value = ""; document.getElementById('prodModis').value = ""; document.getElementById('prodExp').value = "";
+        }
+    </script>
+</body>
+</html>
